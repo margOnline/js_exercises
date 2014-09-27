@@ -1,7 +1,13 @@
 $(document).ready(function() {
 	$(document).on('click', '#add-to-favorite', function(){
 		var color = $('#color').val();
+		favColorItems = $('#colors .item');
+		if (favColorItems.length == 16 ) {
+			$('#colors .item').last().remove();
+		}
 		addBox(color);
+		$('color').val("");
+		$('color').focus();
 	});
 
 	$(document).on('keypress keyup keydown', '#color', function(){
