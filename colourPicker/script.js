@@ -6,13 +6,20 @@ $(document).ready(function() {
 			$('#colors .item').last().remove();
 		}
 		addBox(color);
-		$('color').val("");
-		$('color').focus();
+		$('#color').val("");
+		$('#color').focus();
 	});
 
 	$(document).on('keypress keyup keydown', '#color', function(){
 		var color = $('input').val();
 		setPreviewColor(color);
+	});
+
+	$(document).on('mouseenter', '.item', function(){
+		currentColor = $('.preview').css('background-color');
+		setPreviewColor($(this).css('background-color'));
+	}).on('mouseleave', '.item', function(){
+		setPreviewColor(currentColor);
 	});
 });
 
