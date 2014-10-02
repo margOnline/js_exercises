@@ -11,6 +11,7 @@ function retrieveGenres() {
 		$('#genres').html('There are no genres');
 	});
 }
+
 function displayGenre(genre) {
 	listItem = "<li class='js-genre'>" + genre.key + "</li>"
 	$('#genres').append(listItem);
@@ -47,7 +48,11 @@ function displayProgramme(item){
 	item_html += "<p>" + format_date(item.start, item.end) + "</p>";
 	item_html += "<p>Duration: " + item.duration / 60 + " minutes</p>";
 	item_html += "<p class='service'>" + item.service.title + "</p>"
-	item_html += "<p><a href = '#'>View all upcoming " + item.programme.display_titles.title + "</a></p>";
+
+	if (item.programme.position) {
+		item_html += "<p><a class='view_more' id=" + item.programme.programme.pid + "' href = '#'>View all upcoming " + item.programme.display_titles.title + "</a></p>";
+	}
+
 	item_html += "</li>";
 	$('#programmes').append(item_html);
 }
@@ -68,17 +73,20 @@ function format_date(start, end) {
 	return  date + start_time + " - " + end_time;
 }
 
-function getUpcomingEpisodes(pid){
+function retrieveEpisodes(pid){
+	$('#programmes').empty();
+	$('#programmes').append("<div class='spinner'><img src='spinner.gif' /></div>");
 	$.ajax({
 		url: 'http://www.bbc.co.uk/tv/programmes/' + pid + 'genres.json',
 		dataType: 'json'
 	}).done(function(data){
+		$('.spinner').remove();
 		console.log(data);
-		$.each(data.categories, function(index, elem) {
-			displayGenre(elem);
+		$.each(data.episodes, function(index, elem) {
+			displayProgramme(elem);
 		});
 	}).fail(function(){
-		$('#genres').html('There are no genres');
+		$('#programmes').html('There are no upcoming episodes');
 	});
 }
 
@@ -89,6 +97,11 @@ $(document).ready(function(){
 		$('#genres li').removeClass('active');
 		$(this).addClass('active');
 		getTomorrowsSchedule(genre);
+	});
+
+	$(document).on('click', '#programmes li a', function(e) {
+		pid = $(this).attr('pid');
+		retrieveEpisodes(pid);
 	});
 
 	retrieveGenres();
