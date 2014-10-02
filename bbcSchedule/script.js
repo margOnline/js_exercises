@@ -11,20 +11,18 @@ function retrieveGenres() {
 		$('#genres').html('There are no genres');
 	});
 }
-
 function displayGenre(genre) {
 	listItem = "<li class='js-genre'>" + genre.key + "</li>"
 	$('#genres').append(listItem);
 }
 
 function getTomorrowsSchedule(genre) {
+	$('#programmes').empty();
+	$('#programmes').append("<div class='spinner'><img src='spinner.gif' /></div>");
+
 	$.ajax({
 		url: "http://www.bbc.co.uk/tv/programmes/genres/"+genre+"/schedules/tomorrow.json",
-		dataType: 'json',
-		beforeSend: function(){
-			$('#programmes').empty();
-			$('#programmes').append("<div class='spinner'><img src='spinner.gif' /></div>");
-		}
+		dataType: 'json'
 	}).done(function(data){
 		$('.spinner').remove();
 		console.log(data);
@@ -49,6 +47,7 @@ function displayProgramme(item){
 	item_html += "<p>" + format_date(item.start, item.end) + "</p>";
 	item_html += "<p>Duration: " + item.duration / 60 + " minutes</p>";
 	item_html += "<p class='service'>" + item.service.title + "</p>"
+	item_html += "<p><a href = '#'>View all upcoming " + item.programme.display_titles.title + "</a></p>";
 	item_html += "</li>";
 	$('#programmes').append(item_html);
 }
@@ -67,6 +66,20 @@ function format_date(start, end) {
 	start_time = ("0" + start_hour).slice(-2) + ":" + ("0" + start_min).slice(-2);
 	end_time = ("0" + end_hour).slice(-2) + ":" + ("0" + end_min).slice(-2);
 	return  date + start_time + " - " + end_time;
+}
+
+function getUpcomingEpisodes(pid){
+	$.ajax({
+		url: 'http://www.bbc.co.uk/tv/programmes/' + pid + 'genres.json',
+		dataType: 'json'
+	}).done(function(data){
+		console.log(data);
+		$.each(data.categories, function(index, elem) {
+			displayGenre(elem);
+		});
+	}).fail(function(){
+		$('#genres').html('There are no genres');
+	});
 }
 
 $(document).ready(function(){
