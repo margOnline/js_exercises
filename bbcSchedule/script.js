@@ -39,24 +39,42 @@ function getTomorrowsSchedule(genre) {
 function displayProgramme(item){
 	item_html = "<li>";
 	item_html += "<h2>" + item.programme.display_titles.title + "</h2>";
-	item_html += "<p>" + item.programme.short_synopsis + "</p>"; 
+	item_html += "<p>" + item.programme.short_synopsis + "</p>";
 	if (item.programme.image){
 		src = "http://ichef.bbci.co.uk/images/ic/272x153/" + item.programme.image.pid + ".jpg";
 		item_html += "<img src='" + src + "' />";
 	} else {
 		item_html += "<img src='http://placehold.it/272x153' />";
 	}
-	item_html += "<p>Start: " + item.start + " - " + item.end + "</p>";
+	item_html += "<p>" + format_date(item.start, item.end) + "</p>";
 	item_html += "<p>Duration: " + item.duration / 60 + " minutes</p>";
 	item_html += "<p class='service'>" + item.service.title + "</p>"
 	item_html += "</li>";
 	$('#programmes').append(item_html);
 }
 
+function format_date(start, end) {
+	start_date = new Date(start);
+	end_date = new Date(end);
+	day = start_date.getDay();
+	month = start_date.getMonth() + 1;
+	year = start_date.getFullYear();
+	start_hour = start_date.getHours();
+	start_min = start_date.getMinutes();
+	end_hour = end_date.getHours();
+	end_min = end_date.getMinutes();
+	date = day + "/" + month + "/" + year + " ";
+	start_time = ("0" + start_hour).slice(-2) + ":" + ("0" + start_min).slice(-2);
+	end_time = ("0" + end_hour).slice(-2) + ":" + ("0" + end_min).slice(-2);
+	return  date + start_time + " - " + end_time;
+}
+
 $(document).ready(function(){
-	
+
 	$(document).on('click','#genres li', function(e){
 		genre = $(this).text();
+		$('#genres li').removeClass('active');
+		$(this).addClass('active');
 		getTomorrowsSchedule(genre);
 	});
 
