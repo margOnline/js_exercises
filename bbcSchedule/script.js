@@ -40,9 +40,9 @@ function displayEpisode(item){
 
 function getTomorrowsSchedule(genre) {
 	show_spinner_gif();
-
+	bbc_url = "http://www.bbc.co.uk/tv/programmes/genres/"+genre+"/schedules/tomorrow.json";
 	$.ajax({
-		url: "http://www.bbc.co.uk/tv/programmes/genres/"+genre+"/schedules/tomorrow.json",
+		url: bbc_url,
 		dataType: 'json'
 	}).done(function(data){
 		$('.spinner').remove();
