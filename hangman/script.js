@@ -87,16 +87,19 @@ function noMoreGuesses(){
 }
 
 function showSolution(data){
-  $('.remaining-guesses').text('');
-  $('.remaining-guesses').text('You have used all 7 guesses');
   $('.hangman-word').text(data.solution);
+  displayEndMessage('You have used all 7 guesses');
 }
 
 function endGameSuccessfully(data){
   $('.console').slideToggle(1000);
   $('.hangman-word').text(data.hangman);
+  displayEndMessage("Congratulations! You've won!")
+}
+
+function displayEndMessage(text) {
   $('.remaining-guesses').text('');
-  $('.remaining-guesses').text("Congratulations! You've won!");
+  $('.remaining-guesses').text(text);
 }
 
 $(document).ready(function(){
