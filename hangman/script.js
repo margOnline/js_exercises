@@ -45,7 +45,6 @@ function handleCorrectGuess(data,guess){
   $('.token').text(data.token);
   $('.hangman-word').text(data.hangman);
   displayAllGuesses(guess, 'correct');
-  updateRemainingGuesses();
 }
 
 function handleWrongGuess(data,guess){
