@@ -6,7 +6,7 @@ function prepareGame(){
 function startGame(){
   $('#new-game').hide();
   $('.remaining-guesses').show();
-  $('.console').show();
+  $('.console').slideToggle(1000);
   showLetterHolders();
 }
 
@@ -33,6 +33,16 @@ function makeGuess(token,guess){
   });
 }
 
+function getSolution(token){
+  $.ajax({
+    url: 'http://hangman-api.herokuapp.com/hangman',
+    data: {'token': token }
+  }).done(function(data){
+    console.log(data);
+    showSolution(data);
+  });
+}
+
 function processGuess(data,guess){
   if (data.correct) {
     handleCorrectGuess(data, guess);
@@ -42,25 +52,51 @@ function processGuess(data,guess){
 }
 
 function handleCorrectGuess(data,guess){
-  $('.token').text(data.token);
-  $('.hangman-word').text(data.hangman);
-  displayAllGuesses(guess, 'correct');
+  if (data.hangman.indexOf('_') != -1) {
+    $('.token').text(data.token);
+    $('.hangman-word').text(data.hangman);
+    displayGuess(guess, 'correct');
+  } else {
+    endGameSuccessfully(data);
+  }
 }
 
 function handleWrongGuess(data,guess){
-  updateRemainingGuesses();
-  displayAllGuesses(guess, 'wrong');
-  guesses = $('.remaining').val() - 1;
+  displayGuess(guess, 'wrong');
+  guesses = $('.wrong').length;
+  updateRemaining(guesses);
+  if (guesses == 7) {
+    noMoreGuesses();
+  } else {
     $('.remaining').val(guesses);
+  }
 }
 
-function displayAllGuesses(guess,cssClass){
+function displayGuess(guess,cssClass){
   $('.attempts').append("<span class='" + cssClass +"''>" + guess + "</span>");
 }
 
-function updateRemainingGuesses() {
-  guesses = $('.remaining').text();
-  $('.remaining').text(guesses - 1);
+function updateRemaining(guesses) {
+  $('.remaining').text(7 - guesses);
+}
+
+function noMoreGuesses(){
+  $('.console').slideToggle(1000);
+  token = $('.token').text();
+  getSolution(token);
+}
+
+function showSolution(data){
+  $('.remaining-guesses').text('');
+  $('.remaining-guesses').text('You have used all 7 guesses');
+  $('.hangman-word').text(data.solution);
+}
+
+function endGameSuccessfully(data){
+  $('.console').slideToggle(1000);
+  $('.hangman-word').text(data.hangman);
+  $('.remaining-guesses').text('');
+  $('.remaining-guesses').text("Congratulations! You've won!");
 }
 
 $(document).ready(function(){
@@ -73,8 +109,10 @@ $(document).ready(function(){
   $(document).on('click', '#guess', function(e){
     token = $('.token').text();
     guess = $('.letter').val();
+    $('.letter').focus();
     console.log(token);
     console.log(guess);
     makeGuess(token, guess);
+    $('.letter').val('');
   });
 });
