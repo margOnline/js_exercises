@@ -54,10 +54,10 @@ button {
 }
 
 .correct {
-  color: '#08a932';
+  color: #08a932;
 }
 
-.wrong {
+.wrong, .errorMsg {
   color: #da5754;
 }
 

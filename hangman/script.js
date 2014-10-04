@@ -27,8 +27,16 @@ function displayLetters(data){
 function acceptGuess(){
   token = $('.token').text();
   guess = $('.letter').val();
-  makeGuess(token, guess);
+  if (validGuess(guess)){
+    makeGuess(token, guess);
+  } else {
+    displayErrorMessage();
+  }
   resetGuessBox();
+}
+
+function validGuess(guess){
+  return (guess.trim().length != 1 || $.isNumeric(guess)) ? false : true;
 }
 
 function resetGuessBox(){
@@ -114,6 +122,10 @@ function displayEndMessage(text) {
   $('.remaining-guesses').text('');
   $('.remaining-guesses').text(text);
    $('#new-game').slideToggle(1000);
+}
+
+function displayErrorMessage(){
+  $('.console').append("<p class='errorMsg'>Only letters are accepted.</p>")
 }
 
 $(function(){
