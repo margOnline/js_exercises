@@ -7,18 +7,33 @@ function startGame(){
   $('#new-game').hide();
   $('.remaining-guesses').show();
   $('.console').slideToggle(1000);
-  showLetterHolders();
+  getLetters();
 }
 
-function showLetterHolders(){
+function getLetters(){
   $.ajax({
     type: 'POST',
     url:" http://hangman-api.herokuapp.com/hangman"
   }).done(function(data){
-    console.log(data);
-    $('.hangman-word').text(data.hangman);
-    $('.token').text(data.token);
+    displayLetters(data);
   });
+}
+
+function displayLetters(data){
+  $('.hangman-word').text(data.hangman);
+  $('.token').text(data.token);
+}
+
+function acceptGuess(){
+  token = $('.token').text();
+  guess = $('.letter').val();
+  makeGuess(token, guess);
+  resetGuessBox();
+}
+
+function resetGuessBox(){
+  $('.letter').val('');
+  $('.letter').focus();
 }
 
 function makeGuess(token,guess){
@@ -28,18 +43,7 @@ function makeGuess(token,guess){
     data: { "token": token, "letter": guess },
     url: "http://hangman-api.herokuapp.com/hangman"
   }).done(function(data){
-    console.log(data);
     processGuess(data, guess);
-  });
-}
-
-function getSolution(token){
-  $.ajax({
-    url: 'http://hangman-api.herokuapp.com/hangman',
-    data: {'token': token }
-  }).done(function(data){
-    console.log(data);
-    showSolution(data);
   });
 }
 
@@ -72,18 +76,27 @@ function handleWrongGuess(data,guess){
   }
 }
 
-function displayGuess(guess,cssClass){
-  $('.attempts').append("<span class='" + cssClass +"''>" + guess + "</span>");
-}
-
 function updateRemaining(guesses) {
   $('.remaining').text(7 - guesses);
+}
+
+function displayGuess(guess,cssClass){
+  $('.attempts').append("<span class='" + cssClass +"''>" + guess + "</span>");
 }
 
 function noMoreGuesses(){
   $('.console').slideToggle(1000);
   token = $('.token').text();
   getSolution(token);
+}
+
+function getSolution(token){
+  $.ajax({
+    url: 'http://hangman-api.herokuapp.com/hangman',
+    data: {'token': token }
+  }).done(function(data){
+    showSolution(data);
+  });
 }
 
 function showSolution(data){
@@ -100,9 +113,10 @@ function endGameSuccessfully(data){
 function displayEndMessage(text) {
   $('.remaining-guesses').text('');
   $('.remaining-guesses').text(text);
+   $('#new-game').slideToggle(1000);
 }
 
-$(document).ready(function(){
+$(function(){
   prepareGame();
 
   $(document).on('click','#new-game', function(e){
@@ -110,12 +124,6 @@ $(document).ready(function(){
   });
 
   $(document).on('click', '#guess', function(e){
-    token = $('.token').text();
-    guess = $('.letter').val();
-    $('.letter').focus();
-    console.log(token);
-    console.log(guess);
-    makeGuess(token, guess);
-    $('.letter').val('');
+    acceptGuess();
   });
 });
